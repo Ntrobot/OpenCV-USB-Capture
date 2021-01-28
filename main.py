@@ -1,39 +1,73 @@
 import cv2
+import time
 
 ### Device IDs ###
-DeviceIdArr = [0, 1, 2, 3, 4, 5]
-
-### Number of Cameras ###
-numDevice = len(DeviceIdArr)
+deviceIdArr = [0, 2, 4]
 
 ### Attributes and Methods for Individual Cameras ###
 class Camera:
     def __init__(self, cameraId):
         self.cameraId = cameraId
+        self.dummyCount = 5
+        self.tryCount = 5
+        
+    def setup(self):
+    	# open the device at the designated ID and leave it open
+    	self.cap = cv2.VideoCapture(self.cameraId)
+    	if not(self.cap.isOpened()):
+    		print("Could not open the device. Device ID: {}".format(self.cameraId))
 
-    def captureSave:
-        # Open the device at the designated ID
-        cap = cv2.VideoCapture(self.cameraId)
+    	# set frame dimensions
+    	self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    	self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    	self.cap.set(cv2.CAP_PROP_FPS, 45)
+    	
+#    	time.sleep(10)
+    	
+    	# dummy read
+    	for i in range(self.dummyCount):
+    		dummyRet, dummyFrame = self.cap.read()
 
-        if not(cap.isOpened()):
-            # Check whether the selected camera is opened successfully
-            raise Exception("Could not open the device. ID: {}".format(self.cameraId))
-        else:
-            # Set the resolution
-            cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 640)
-            cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
-            # capture the frame
-            ret, frame = cap.read()
-            # save the frame
-            cv2.imwrite("ID{}.jpg", frame)
-            # release the camera
-            cap.release()
+#	time.sleep(10)
+
+    def captureSave(self):
+    	while(self.tryCount != 0):
+    		ret, frame = self.cap.read()
+    		if not(ret):
+    		# in case read() failed
+    			self.tryCount -= 1
+    			print("Failed to grab frame. Try: {} Device ID: {}".format(self.tryCount, self.cameraId))
+    		else:
+    			# save image
+    			cv2.imwrite("ID{}.jpg".format(self.cameraId), frame)
+    			self.tryCount = 0
+            
+    def cleanup(self):
+    	# release and delete
+    	self.cap.release()
+    	del(self.cap)
+
 
 ### Create the required number of Camera instances ###
 camerasList = list()
-for Id in DeviceIdArr:
-    cameras.append(Camera(Id))
+for Id in deviceIdArr:
+    camerasList.append(Camera(Id))
+
+### Initialize all camera instances ###
+for camera in camerasList:
+	camera.setup()
+#	time.sleep(10)
 
 ### For each instance, capture and save each frame ###
-for camera in cameraList:
-    camera.captureSave()
+for camera in camerasList:
+	camera.captureSave()
+    
+### Release and delete all cameras ###
+for camera in camerasList:
+	camera.cleanup()
+
+#testInstance = Camera(0)
+#testInstance.setup()
+#time.sleep(10)
+#testInstance.captureSave()
+
