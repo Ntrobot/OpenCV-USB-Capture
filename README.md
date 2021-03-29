@@ -1,7 +1,7 @@
 # OpenCV-USB-Capture
 Python script to capture images from multiple UVC-compliant (plug and play) USB cameras at once. This repository is created for the Asagao Project at inaho Inc.
 
-## Required dependencies
+## Required Dependencies
 - sudo apt install v4l-utils
 - pip3 install opencv-python==4.5.1.48
 
